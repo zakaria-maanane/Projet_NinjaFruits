@@ -1,0 +1,175 @@
+import pygame
+import random
+import sys  
+
+# Initialisation de Pygame
+pygame.init()
+
+def enregistrer_score(score):
+    with open("scores.txt", "a") as fichier:  # Mode "a" pour ajouter sans écraser
+        fichier.write(f"Score : {score}\n")
+
+# Dimensions de la fenêtre
+LARGEUR, HAUTEUR = 800, 600
+écran = pygame.display.set_mode((LARGEUR, HAUTEUR))
+pygame.display.set_caption("Fruit Ninja")  
+
+# Couleurs
+BLANC = (255, 255, 255)
+NOIR = (0, 0, 0)
+ROUGE = (255, 0, 0)
+VERT = (0, 255, 0)
+BLEU = (0, 0, 255)
+JAUNE = (255, 255, 0)
+
+# Chargement de l'image de la bombe avec vérification
+try:
+    bombe_image = pygame.image.load("/mnt/chromeos/MyFiles/fruit ninja/bombe.webp")
+    bombe_image = pygame.transform.scale(bombe_image, (50, 50))
+except pygame.error:
+    print("Erreur : Image de la bombe non trouvée ! Vérifiez le chemin.")
+    sys.exit()
+
+# Police
+defaut_police = pygame.font.Font(None, 36)
+
+# Variables globales
+horloge = pygame.time.Clock()
+FPS = 60
+score = 0
+
+# Classe Fruit/Bombe
+class Fruit:
+    def __init__(self):
+        self.est_bombe = random.random() < 0.2  # 20% de chances d'être une bombe
+
+        if self.est_bombe:
+            self.rayon = 25
+            self.vitesse = random.uniform(3, 5)
+        else:
+            self.couleur = random.choice([ROUGE, VERT, BLEU, JAUNE])
+            if self.couleur == ROUGE:
+                self.rayon = 30  
+                self.vitesse = 3  
+            elif self.couleur == VERT:
+                self.rayon = 40  
+                self.vitesse = 3  
+            elif self.couleur == BLEU:
+                self.rayon = 20  
+                self.vitesse = 6  
+            elif self.couleur == JAUNE:
+                self.rayon = 25  
+                self.vitesse = 5  
+
+        self.x = random.randint(self.rayon, LARGEUR - self.rayon)
+        self.y = HAUTEUR + self.rayon
+        self.coupé = False
+
+    def bouger(self):
+        self.y -= self.vitesse
+
+    def dessiner(self):
+        if not self.coupé:
+            if self.est_bombe:
+                écran.blit(bombe_image, (self.x - 25, self.y - 25))  # Centrer l'image
+            else:
+                pygame.draw.circle(écran, self.couleur, (int(self.x), int(self.y)), self.rayon)
+
+    def est_touché(self, pos):
+        distance = ((self.x - pos[0])**2 + (self.y - pos[1])**2)**0.5
+        return distance <= self.rayon
+
+# Classe Lame
+class Lame:
+    def __init__(self):
+        self.positions = []
+        self.longueur_max = 10
+
+    def mettre_à_jour(self, pos):
+        self.positions.append(pos)
+        if len(self.positions) > self.longueur_max:
+            self.positions.pop(0)
+
+    def dessiner(self):
+        if len(self.positions) > 1:
+            pygame.draw.lines(écran, VERT, False, self.positions, 3)
+
+# Classe principale du jeu
+class JeuFruitNinja:
+    def __init__(self):
+        self.fruits = []
+        self.lame = Lame()
+        self.en_cours = True
+        self.timer_ajout = 0
+
+    def ajouter_fruit(self):
+        self.fruits.append(Fruit())
+
+    def gérer_événements(self):
+        for événement in pygame.event.get():
+            if événement.type == pygame.QUIT:
+                self.en_cours = False
+
+    def mettre_à_jour(self): 
+        global score
+        self.lame.mettre_à_jour(pygame.mouse.get_pos())
+
+        fruits_a_supprimer = []
+
+        for fruit in self.fruits:
+            fruit.bouger()
+            if fruit.y < -fruit.rayon:
+                fruits_a_supprimer.append(fruit)
+
+            if not fruit.coupé and fruit.est_touché(pygame.mouse.get_pos()):
+                fruit.coupé = True
+
+                if fruit.est_bombe:
+                    
+                    self.en_cours = False  
+                    pygame.time.delay(2000)  # Attendre 2 secondes avant de fermer
+                else:
+                    if fruit.couleur == VERT:
+                        score += 1  
+                    elif fruit.couleur == BLEU:
+                        score += 2  
+                    elif fruit.couleur == JAUNE:
+                        score += 25  
+
+                fruits_a_supprimer.append(fruit)  
+
+        for fruit in fruits_a_supprimer:
+            self.fruits.remove(fruit)
+
+        self.timer_ajout += 1
+        if self.timer_ajout > 30:  
+            self.ajouter_fruit()
+            self.timer_ajout = 0 
+
+    def dessiner(self):
+        écran.fill(NOIR)  
+        self.lame.dessiner()
+
+        for fruit in self.fruits:
+            fruit.dessiner()
+
+        texte_score = defaut_police.render(f"Score : {score}", True, BLANC)
+        écran.blit(texte_score, (10, 10))
+
+        pygame.display.flip()
+
+    def exécuter(self):
+        global score
+        while self.en_cours:
+            self.gérer_événements()
+            self.mettre_à_jour()
+            self.dessiner()
+            horloge.tick(FPS)
+
+        enregistrer_score(score)  # Enregistrer le score après la fin de la partie
+
+if __name__ == "__main__":
+    jeu = JeuFruitNinja()
+    jeu.exécuter()
+    pygame.quit()
+    sys.exit()
