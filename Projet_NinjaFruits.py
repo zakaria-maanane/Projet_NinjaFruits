@@ -16,16 +16,16 @@ pygame.display.set_caption("Fruit Ninja")
 
 # Chargement et redimensionnement des images des fruits
 image_rouge = pygame.image.load("bombe.png")
-image_rouge = pygame.transform.scale(image_rouge, (90, 90))  # Redimensionner à 60x60 pixels
+image_rouge = pygame.transform.scale(image_rouge, (90, 90))  
 
 image_vert = pygame.image.load("pomme.png")
-image_vert = pygame.transform.scale(image_vert, (80, 80))  # Redimensionner à 60x60 pixels
+image_vert = pygame.transform.scale(image_vert, (80, 80))  
 
 image_bleu = pygame.image.load("glacon.png")
-image_bleu = pygame.transform.scale(image_bleu, (60, 60))  # Redimensionner à 60x60 pixels
+image_bleu = pygame.transform.scale(image_bleu, (60, 60))  
 
 image_jaune = pygame.image.load("fraise.png")
-image_jaune = pygame.transform.scale(image_jaune, (60, 60))  # Redimensionner à 60x60 pixels
+image_jaune = pygame.transform.scale(image_jaune, (60, 60)) 
 
 # Police
 defaut_police = pygame.font.Font(None, 36)
@@ -37,7 +37,9 @@ score = 0
 
 # Six hauteurs distinctes où les fruits atteignent leur équilibre
 hauteurs_niveaux = [HAUTEUR // 6, HAUTEUR // 3, HAUTEUR // 2, HAUTEUR * 2 // 3, HAUTEUR * 5 // 6, HAUTEUR]  # 6 niveaux distincts
-# Classe Fruit
+
+
+# Classe Fruit 
 class Fruit:
     def __init__(self, image):
         self.image = image
@@ -121,11 +123,24 @@ class JeuFruitNinja:
         self.timer_ajout = 0
 
     def ajouter_fruit(self):
-        if score >= 20:
-            fruit_choisi = random.choices([image_rouge, image_vert, image_bleu, image_jaune], [2, 1, 1, 1])[0]
+        # Définir les probabilités en fonction du score
+        if score < 10:
+            # Avant 10 points, seules les pommes apparaissent fréquemment
+            fruit_choisi = random.choices([image_rouge, image_vert, image_bleu, image_jaune], [0, 5, 0, 0])[0]
+        
+        elif 10 <= score < 20:
+            # Entre 10 et 20 points, les pommes diminuent et les bombes commencent à apparaître
+            fruit_choisi = random.choices([image_rouge, image_vert, image_bleu, image_jaune], [0, 3, 0, 0])[0]
+        
+        elif 20 <= score < 30:
+            # Entre 20 et 30 points, les bombes deviennent plus fréquentes et les glaçons apparaissent rarement
+            fruit_choisi = random.choices([image_rouge, image_vert, image_bleu, image_jaune], [1, 3, 2, 0])[0]
+        
         else:
-            fruit_choisi = random.choice([image_rouge, image_vert, image_bleu, image_jaune])
+            # À partir de 30 points, les glaçons et les fraises deviennent plus fréquents, mais rares
+            fruit_choisi = random.choices([image_rouge, image_vert, image_bleu, image_jaune], [2, 2, 3, 2])[0]
 
+        # Ajouter le fruit choisi à la liste des fruits
         self.fruits.append(Fruit(fruit_choisi))
 
     def gérer_événements(self):
