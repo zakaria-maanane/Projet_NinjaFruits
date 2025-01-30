@@ -5,9 +5,18 @@ import sys
 # Initialisation de Pygame
 pygame.init()
 
-def enregistrer_score(score):
+def enregistrer_score(nom, score):
     with open("scores.txt", "a") as fichier:  # Mode "a" pour ajouter sans écraser
-        fichier.write(f"Score : {score}\n")
+        fichier.write(f"{nom}: Score : {score}\n")
+
+def afficher_joueurs():
+    joueurs = []
+    try:
+        with open("scores.txt", "r") as fichier:
+            joueurs = fichier.readlines()
+    except FileNotFoundError:
+        pass
+    return joueurs
 
 # Dimensions de la fenêtre
 LARGEUR, HAUTEUR = 1300, 700
@@ -121,32 +130,65 @@ class JeuFruitNinja:
         self.lame = Lame()
         self.en_cours = True
         self.timer_ajout = 0
+        self.nom_joueur = ""
+    
+    def accueil(self):
+        nom = ""
+        actif = True
+        while actif:
+            for événement in pygame.event.get():
+                if événement.type == pygame.QUIT:
+                    self.en_cours = False  # Ferme le jeu si la fenêtre est fermée
+                    actif = False
+                    break
+                if événement.type == pygame.KEYDOWN:
+                    if événement.key == pygame.K_BACKSPACE:
+                        nom = nom[:-1]
+                    elif événement.key == pygame.K_RETURN:
+                        self.nom_joueur = nom
+                        actif = False
+                    else:
+                        nom += événement.unicode
+
+            # Afficher l'écran d'accueil et les scores
+            écran.fill((0, 0, 0))
+            titre = defaut_police.render("Fruit Ninja", True, (255, 255, 255))
+            écran.blit(titre, (LARGEUR // 2 - titre.get_width() // 2, 100))
+
+            joueur_text = defaut_police.render("Entrez votre nom:", True, (255, 255, 255))
+            écran.blit(joueur_text, (LARGEUR // 2 - joueur_text.get_width() // 2, 200))
+
+            nom_text = defaut_police.render(nom, True, (255, 255, 255))
+            écran.blit(nom_text, (LARGEUR // 2 - nom_text.get_width() // 2, 300))
+
+            # Afficher les scores des joueurs enregistrés
+            joueurs = afficher_joueurs()
+            y_offset = 400
+            for joueur in joueurs:
+                score_text = defaut_police.render(joueur, True, (255, 255, 255))
+                écran.blit(score_text, (LARGEUR // 2 - score_text.get_width() // 2, y_offset))
+                y_offset += 40
+
+            pygame.display.flip()
+            horloge.tick(FPS)
 
     def ajouter_fruit(self):
-        # Définir les probabilités en fonction du score
+        # Logique pour ajouter un fruit en fonction du score
         if score < 10:
-            # Avant 10 points, seules les pommes apparaissent fréquemment
             fruit_choisi = random.choices([image_rouge, image_vert, image_bleu, image_jaune], [0, 5, 0, 0])[0]
-        
         elif 10 <= score < 20:
-            # Entre 10 et 20 points, les pommes diminuent et les bombes commencent à apparaître
-            fruit_choisi = random.choices([image_rouge, image_vert, image_bleu, image_jaune], [0, 3, 0, 0])[0]
-        
+            fruit_choisi = random.choices([image_rouge, image_vert, image_bleu, image_jaune], [2, 3, 0, 0])[0]
         elif 20 <= score < 30:
-            # Entre 20 et 30 points, les bombes deviennent plus fréquentes et les glaçons apparaissent rarement
-            fruit_choisi = random.choices([image_rouge, image_vert, image_bleu, image_jaune], [1, 3, 2, 0])[0]
-        
+            fruit_choisi = random.choices([image_rouge, image_vert, image_bleu, image_jaune], [4, 1, 2, 0])[0]
         else:
-            # À partir de 30 points, les glaçons et les fraises deviennent plus fréquents, mais rares
-            fruit_choisi = random.choices([image_rouge, image_vert, image_bleu, image_jaune], [2, 2, 3, 2])[0]
+            fruit_choisi = random.choices([image_rouge, image_vert, image_bleu, image_jaune], [5, 2, 3, 1])[0]
 
-        # Ajouter le fruit choisi à la liste des fruits
         self.fruits.append(Fruit(fruit_choisi))
 
     def gérer_événements(self):
         for événement in pygame.event.get():
             if événement.type == pygame.QUIT:
-                self.en_cours = False
+                self.en_cours = False  # Ferme le jeu si la fenêtre est fermée
 
     def mettre_à_jour(self):
         global score
@@ -195,6 +237,7 @@ class JeuFruitNinja:
         pygame.display.flip()
 
     def exécuter(self):
+        self.accueil()  # Appel à la page d'accueil avant de commencer le jeu
         global score
         while self.en_cours:
             self.gérer_événements()
@@ -204,6 +247,7 @@ class JeuFruitNinja:
 
         enregistrer_score(score)
 
+# Lancer le jeu
 if __name__ == "__main__":
     jeu = JeuFruitNinja()
     jeu.exécuter()
