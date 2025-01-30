@@ -33,7 +33,7 @@ image_vert = pygame.transform.scale(image_vert, (80, 80))
 image_bleu = pygame.image.load("glacon.png")
 image_bleu = pygame.transform.scale(image_bleu, (60, 60))  
 
-image_jaune = pygame.image.load("fraise.png")
+image_jaune = pygame.image.load("banana.jpg")
 image_jaune = pygame.transform.scale(image_jaune, (60, 60)) 
 
 # Police
@@ -181,15 +181,17 @@ class JeuFruitNinja:
             horloge.tick(FPS)
 
     def ajouter_fruit(self):
-        # Logique pour ajouter un fruit en fonction du score
         if score < 10:
-            fruit_choisi = random.choices([image_rouge, image_vert, image_bleu, image_jaune], [0, 5, 0, 0])[0]
+           fruit_choisi = random.choices([image_rouge, image_vert, image_bleu, image_jaune], [0, 8, 0, 0])[0]
         elif 10 <= score < 20:
-            fruit_choisi = random.choices([image_rouge, image_vert, image_bleu, image_jaune], [2, 3, 0, 0])[0]
+           fruit_choisi = random.choices([image_rouge, image_vert, image_bleu, image_jaune], [0, 5, 0, 0])[0]
         elif 20 <= score < 30:
-            fruit_choisi = random.choices([image_rouge, image_vert, image_bleu, image_jaune], [4, 1, 2, 0])[0]
+            fruit_choisi = random.choices([image_rouge, image_vert, image_bleu, image_jaune], [0, 2, 1, 1])[0]
+        elif score > 30 :
+            fruit_choisi = random.choices([image_rouge, image_vert, image_bleu, image_jaune], [1, 4, 2, 2])[0]    
         else:
-            fruit_choisi = random.choices([image_rouge, image_vert, image_bleu, image_jaune], [5, 2, 3, 1])[0]
+             fruit_choisi = random.choices([image_rouge, image_vert, image_bleu, image_jaune], [0, 2, 3, 1])[0]
+
 
         self.fruits.append(Fruit(fruit_choisi))
 
