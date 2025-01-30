@@ -123,6 +123,14 @@ class Lame:
     def dessiner(self):
         if len(self.positions) > 1:
             pygame.draw.lines(écran, (255, 255, 255), False, self.positions, 3)
+# Votre code principal
+
+# Fonction de mise à jour de l'affichage du score
+def dessiner_score():
+    texte_score = defaut_police.render(f"Score : {score}", True, (255, 255, 255))
+    écran.blit(texte_score, (10, 10))  # Dessine le score en haut à gauche de l'écran
+
+
 
 class JeuFruitNinja:
     def __init__(self):
@@ -131,7 +139,7 @@ class JeuFruitNinja:
         self.en_cours = True
         self.timer_ajout = 0
         self.nom_joueur = ""
-    
+
     def accueil(self):
         nom = ""
         actif = True
@@ -225,14 +233,13 @@ class JeuFruitNinja:
             self.timer_ajout = 0
 
     def dessiner(self):
-        écran.fill((0, 0, 0))
+        écran.fill((0, 0, 0))  # Effacer l'écran à chaque itération
         self.lame.dessiner()
 
         for fruit in self.fruits:
             fruit.dessiner()
 
-        texte_score = defaut_police.render(f"Score : {score}", True, (255, 255, 255))
-        écran.blit(texte_score, (10, 10))
+        dessiner_score()  # Afficher le score
 
         pygame.display.flip()
 
@@ -245,7 +252,7 @@ class JeuFruitNinja:
             self.dessiner()
             horloge.tick(FPS)
 
-        enregistrer_score(score)
+        enregistrer_score(self.nom_joueur, score)
 
 # Lancer le jeu
 if __name__ == "__main__":
