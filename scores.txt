@@ -8,3 +8,13 @@ maria: Score : 15
 omi: Score : 16
 : Score : 87
 ali: Score : 57
+: Score : 0
+: Score : 0
+Kerry: Score : 38
+: Score : 0
+: Score : 0
+: Score : 0
+zak: Score : 42
+reda: Score : 30
+: Score : 0
+: Score : 0
