@@ -1,0 +1,127 @@
+import pygame
+import random
+import sys
+
+# Initialisation de Pygame
+pygame.init()
+
+def enregistrer_score(nom, score):
+    with open("scores.txt", "a") as fichier:
+        fichier.write(f"{nom}: Score : {score}\n")
+
+def afficher_joueurs():
+    joueurs = []
+    try:
+        with open("scores.txt", "r") as fichier:
+            joueurs = fichier.readlines()
+    except FileNotFoundError:
+        pass
+    return joueurs
+
+# Dimensions de la fenêtre
+LARGEUR, HAUTEUR = 1300, 700
+écran = pygame.display.set_mode((LARGEUR, HAUTEUR))
+pygame.display.set_caption("Fruit Ninja")
+
+# Chargement et redimensionnement des images des fruits
+image_rouge = pygame.image.load("/mnt/chromeos/MyFiles/fruit ninja/bombe.webp")
+image_rouge = pygame.transform.scale(image_rouge, (90, 90))  
+
+image_vert = pygame.image.load("/mnt/chromeos/MyFiles/fruit ninja/banane.png")
+image_vert = pygame.transform.scale(image_vert, (80, 80))  
+
+image_bleu = pygame.image.load("/mnt/chromeos/MyFiles/fruit ninja/glaconimage_1434128.jpg")
+image_bleu = pygame.transform.scale(image_bleu, (60, 60))  
+
+image_jaune = pygame.image.load("/mnt/chromeos/MyFiles/fruit ninja/banane.png")
+image_jaune = pygame.transform.scale(image_jaune, (60, 60)) 
+
+# Associer chaque fruit à une touche
+TOUCHES_FRUITS = {
+    "x": image_rouge,  # Bombe
+    "v": image_vert,   # Banane
+    "b": image_bleu,   # Glaçon
+    "j": image_jaune   # Autre banane
+}
+
+# Classe Fruit 
+class Fruit:
+    def __init__(self, image, type_fruit):
+        self.image = image
+        self.type = type_fruit
+        self.rect = self.image.get_rect()
+        self.rect.centerx = random.randint(self.rect.width, LARGEUR - self.rect.width)
+        self.rect.bottom = HAUTEUR + self.rect.height
+        self.coupé = False
+
+    def bouger(self):
+        if not self.coupé:
+            self.rect.y -= 5
+            if self.rect.y < 0:
+                self.coupé = True
+
+    def dessiner(self):
+        if not self.coupé:
+            écran.blit(self.image, self.rect)
+
+# Classe JeuFruitNinja
+class JeuFruitNinja:
+    def __init__(self):
+        self.fruits = []
+        self.en_cours = True
+        self.timer_ajout = 0
+        self.nom_joueur = ""
+
+    def gérer_événements(self):
+        global score
+        for événement in pygame.event.get():
+            if événement.type == pygame.QUIT:
+                self.en_cours = False
+            elif événement.type == pygame.KEYDOWN:
+                touche = événement.unicode.lower()
+                for fruit in self.fruits:
+                    if not fruit.coupé and fruit.type == TOUCHES_FRUITS.get(touche):
+                        fruit.coupé = True
+                        if fruit.type == image_rouge:
+                            self.en_cours = False
+                        elif fruit.type == image_vert:
+                            score += 1
+                        elif fruit.type == image_bleu:
+                            score += 2
+                        elif fruit.type == image_jaune:
+                            score += 3
+
+    def ajouter_fruit(self):
+        fruit_choisi = random.choice(list(TOUCHES_FRUITS.values()))
+        self.fruits.append(Fruit(fruit_choisi, fruit_choisi))
+
+    def mettre_à_jour(self):
+        self.timer_ajout += 1
+        if self.timer_ajout > 30:
+            self.ajouter_fruit()
+            self.timer_ajout = 0
+        for fruit in self.fruits:
+            fruit.bouger()
+
+    def dessiner(self):
+        écran.fill((0, 0, 0))
+        for fruit in self.fruits:
+            fruit.dessiner()
+        pygame.display.flip()
+
+    def exécuter(self):
+        global score
+        while self.en_cours:
+            self.gérer_événements()
+            self.mettre_à_jour()
+            self.dessiner()
+            pygame.time.Clock().tick(60)
+
+# Lancer le jeu
+if __name__ == "__main__":
+    score = 0
+    jeu = JeuFruitNinja()
+    jeu.exécuter()
+    pygame.quit()
+    sys.exit()
+   
