@@ -91,7 +91,7 @@ class Fruit:
 
     def bouger(self):
         if not self.atteint_équilibre:
-            self.rect.y += self.vitesse_y
+            self.rect.y += self.vitesse_y 
             self.rect.x += self.vitesse_x
             self.vitesse_y += 0.1
 
