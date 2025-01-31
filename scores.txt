@@ -18,3 +18,12 @@ zak: Score : 42
 reda: Score : 30
 : Score : 0
 : Score : 0
+Darius: Score : 57
+zakaria: Score : 5
+zak: Score : 26
+o: Score : 28
+k: Score : 28
+op: Score : 26
+zak: Score : 107
+: Score : 46
+: Score : 37
