@@ -2,7 +2,7 @@ import pygame
 import random
 import sys
 import time
-
+import math
 # Initialisation de Pygame
 pygame.init()
 
@@ -47,6 +47,9 @@ image_bleu = pygame.transform.scale(image_bleu, (60, 60))
 image_jaune = pygame.image.load("banana.jpg")
 image_jaune = pygame.transform.scale(image_jaune, (60, 60)) 
 
+image_violet = pygame.transform.scale(pygame.image.load("glace.jpg"), (70, 70))  # Fruit sinusoïdal
+
+
 # Police
 defaut_police = pygame.font.Font(None, 36)
 
@@ -89,20 +92,39 @@ class Fruit:
             self.position_cible = hauteurs_niveaux[0]
             self.atteint_équilibre = False
 
-    def bouger(self):
-        if not self.atteint_équilibre:
-            self.rect.y += self.vitesse_y 
-            self.rect.x += self.vitesse_x
-            self.vitesse_y += 0.1
 
-            if self.rect.top <= self.position_cible:
-                self.rect.top = self.position_cible
-                self.vitesse_y = 0
-                self.atteint_équilibre = True
-        else:
-            self.vitesse_y += self.acceleration
-            self.rect.y += self.vitesse_y
-            self.rect.x += self.vitesse_x
+        elif self.image == image_violet:
+            self.init_fruit(0, 3, 0, 0)  # Mouvement sinusoïdal
+            self.angle = 0
+
+    def init_fruit(self, vy, vx, acc, pos):
+        self.vitesse_y = vy
+        self.vitesse_x = vx
+        self.acceleration = acc
+        self.position_cible = pos
+        self.atteint_équilibre = False
+        self.rect.centerx = random.randint(self.rect.width, LARGEUR - self.rect.width)
+        self.rect.bottom = HAUTEUR + self.rect.height
+
+    def bouger(self):
+        if self.image == image_violet:
+            self.rect.x += 5 * math.sin(self.angle)
+            self.rect.y -= 3
+            self.angle += 0.1
+        else:    
+            if not self.atteint_équilibre:
+               self.rect.y += self.vitesse_y 
+               self.rect.x += self.vitesse_x
+               self.vitesse_y += 0.1
+
+               if self.rect.top <= self.position_cible:
+                  self.rect.top = self.position_cible
+                  self.vitesse_y = 0
+                  self.atteint_équilibre = True
+            else:
+                self.vitesse_y += self.acceleration
+                self.rect.y += self.vitesse_y
+                self.rect.x += self.vitesse_x
 
             if self.rect.bottom >= HAUTEUR + self.rect.height:
                 self.coupé = True
@@ -146,15 +168,15 @@ class JeuFruitNinja:
     def ajouter_fruit(self):
         global score
         if score < 10:
-            fruit_choisi = random.choices([image_rouge, image_vert, image_bleu, image_jaune], [0, 8, 0, 0])[0]
+            fruit_choisi = random.choices([image_rouge, image_vert, image_bleu, image_jaune, image_violet], [0, 8, 0, 0 ,1])[0]
         elif 10 <= score < 20:
-            fruit_choisi = random.choices([image_rouge, image_vert, image_bleu, image_jaune], [0, 5, 0, 0])[0]
+            fruit_choisi = random.choices([image_rouge, image_vert, image_bleu, image_jaune, image_violet], [0, 5, 0, 0 ,2])[0]
         elif 20 <= score < 30:
-            fruit_choisi = random.choices([image_rouge, image_vert, image_bleu, image_jaune], [0, 2, 1, 1])[0]
+            fruit_choisi = random.choices([image_rouge, image_vert, image_bleu, image_jaune , image_violet], [0, 2, 1, 1,2])[0]
         elif score > 30:
-            fruit_choisi = random.choices([image_rouge, image_vert, image_bleu, image_jaune], [1, 4, 2, 2])[0]
+            fruit_choisi = random.choices([image_rouge, image_vert, image_bleu, image_jaune , image_violet], [1, 4, 2, 2 ,2])[0]
         else:
-            fruit_choisi = random.choices([image_rouge, image_vert, image_bleu, image_jaune], [0, 2, 3, 1])[0]
+            fruit_choisi = random.choices([image_rouge, image_vert, image_bleu, image_jaune , image_violet], [0, 2, 3, 1, 2])[0]
 
         self.fruits.append(Fruit(fruit_choisi))
 
