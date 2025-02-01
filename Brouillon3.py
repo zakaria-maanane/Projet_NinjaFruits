@@ -25,7 +25,7 @@ LARGEUR, HAUTEUR = 1300, 700
 pygame.display.set_caption("Fruit Ninja")
 
 # Charger l'image de fond
-fond = pygame.image.load("5.png")
+fond = pygame.image.load("montagne.png")
 fond = pygame.transform.scale(fond, (LARGEUR, HAUTEUR))
 
 # Charger et jouer la musique de fond
