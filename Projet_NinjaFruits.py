@@ -39,15 +39,15 @@ image_rouge = pygame.image.load("bombe.png")
 image_rouge = pygame.transform.scale(image_rouge, (90, 90))  
 
 image_vert = pygame.image.load("pomme.png")
-image_vert = pygame.transform.scale(image_vert, (80, 80))  
+image_vert = pygame.transform.scale(image_vert, (100, 100))  
 
-image_bleu = pygame.image.load("glacon.png")
+image_bleu = pygame.image.load("glace.png")
 image_bleu = pygame.transform.scale(image_bleu, (60, 60))  
 
-image_jaune = pygame.image.load("banana.jpg")
-image_jaune = pygame.transform.scale(image_jaune, (60, 60)) 
+image_jaune = pygame.image.load("banana.png")
+image_jaune = pygame.transform.scale(image_jaune, (80, 80)) 
 
-image_violet = pygame.transform.scale(pygame.image.load("glace.jpg"), (70, 70))  # Fruit sinusoïdal
+image_violet = pygame.transform.scale(pygame.image.load("orange.png"), (100, 100))  # Fruit sinusoïdal
 
 
 # Police
@@ -74,8 +74,8 @@ class Fruit:
             self.position_cible = hauteurs_niveaux[0]
             self.atteint_équilibre = False
         elif self.image == image_jaune:
-            self.vitesse_y = -5
-            self.vitesse_x = 6
+            self.vitesse_y = -1
+            self.vitesse_x = 16
             self.acceleration = 0.2
             self.position_cible = hauteurs_niveaux[0]
             self.atteint_équilibre = False
