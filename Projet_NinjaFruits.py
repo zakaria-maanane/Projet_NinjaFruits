@@ -212,13 +212,15 @@ class JeuFruitNinja:
                             if fruit.image == image_rouge:
                                 self.en_cours = False  # Fin du jeu si la bombe est touchée
                             elif fruit.image == image_vert:
-                                score += 1
-                            elif fruit.image == image_bleu:
                                 score += 2
+                            elif fruit.image == image_bleu:
+                                score += 3
                                 self.pause_glaçon = True
                                 self.temps_debut_glaçon = time.time()  # Démarre la pause
                             elif fruit.image == image_jaune:
                                 score += 3
+                            elif fruit.image == image_violet:
+                                score += 2    
                     fruits_a_supprimer = [fruit for fruit in self.fruits if getattr(fruit, 'coupé', False)]
                     for fruit in fruits_a_supprimer:
                         self.fruits.remove(fruit)
@@ -340,7 +342,7 @@ class Accueil:
 
                     pygame.display.flip()
 
-        # Fermer la fenêtre après que l'utilisateur ait appuyé sur Entrée et terminé
+        
         
         
 
