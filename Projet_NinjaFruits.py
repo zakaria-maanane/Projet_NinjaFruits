@@ -168,6 +168,7 @@ TOUCHES_FRUITS = {
     "o": image_violet
 }
 
+
 class JeuFruitNinja:
     def __init__(self):
         self.fruits = []
@@ -178,17 +179,17 @@ class JeuFruitNinja:
         self.temps_debut_glaçon = 0
         self.paused_fruits = False
         self.nom_joueur = ""
-        self.vies = 25  # Ajout du compteur de vies
+        self.vies = 5  # Compteur de vies
+        self.score = 0  # Compteur de score
 
     def ajouter_fruit(self):
-        global score
-        if score < 10:
+        if self.score < 10:
             fruit_choisi = random.choices([image_rouge, image_vert, image_bleu, image_jaune, image_violet], [0, 13, 0, 0 ,1])[0]
-        elif 10 <= score < 20:
+        elif 10 <= self.score < 20:
             fruit_choisi = random.choices([image_rouge, image_vert, image_bleu, image_jaune, image_violet], [0, 5, 0, 0 ,2])[0]
-        elif 20 <= score < 30:
+        elif 20 <= self.score < 30:
             fruit_choisi = random.choices([image_rouge, image_vert, image_bleu, image_jaune , image_violet], [0, 2, 1, 1,2])[0]
-        elif score > 30:
+        elif self.score > 30:
             fruit_choisi = random.choices([image_rouge, image_vert, image_bleu, image_jaune , image_violet], [1, 4, 2, 2 ,2])[0]
         else:
             fruit_choisi = random.choices([image_rouge, image_vert, image_bleu, image_jaune , image_violet], [0, 2, 3, 1, 2])[0]
@@ -196,14 +197,13 @@ class JeuFruitNinja:
         self.fruits.append(Fruit(fruit_choisi))
 
     def gérer_événements(self):
-        global score, nom_joueur
         for événement in pygame.event.get():
             if événement.type == pygame.QUIT:
                 self.en_cours = False
             elif événement.type == pygame.KEYDOWN:
                 if événement.key == pygame.K_RETURN:
-                    if nom_joueur != "":
-                        enregistrer_score(nom_joueur, score)
+                    if self.nom_joueur != "":
+                        enregistrer_score(self.nom_joueur, self.score)
                     self.en_cours = False  # Quitte le jeu après avoir enregistré
                 elif chr(événement.key) in TOUCHES_FRUITS:
                     fruit_image = TOUCHES_FRUITS[chr(événement.key)]
@@ -213,19 +213,18 @@ class JeuFruitNinja:
                             if fruit.image == image_rouge:
                                 self.en_cours = False  # Fin du jeu si la bombe est touchée
                             elif fruit.image == image_vert:
-                                score += 1
+                                self.score += 1  # Incrémente le score localement
                             elif fruit.image == image_bleu:
-                                score += 2
+                                self.score += 2
                                 self.pause_glaçon = True
                                 self.temps_debut_glaçon = time.time()  # Démarre la pause
                             elif fruit.image == image_jaune:
-                                score += 3
+                                self.score += 3
                     fruits_a_supprimer = [fruit for fruit in self.fruits if getattr(fruit, 'coupé', False)]
                     for fruit in fruits_a_supprimer:
                         self.fruits.remove(fruit)
 
     def mettre_a_jour(self):
-        global score
         if self.pause_glaçon and time.time() - self.temps_debut_glaçon < 5:
             self.paused_fruits = True
         else:
@@ -254,13 +253,13 @@ class JeuFruitNinja:
                 if fruit.image == image_rouge:
                     self.en_cours = False
                 elif fruit.image == image_vert:
-                    score += 1
+                    self.score += 1  # Incrémente le score localement
                 elif fruit.image == image_bleu:
-                    score += 2
+                    self.score += 2
                     self.pause_glaçon = True
                     self.temps_debut_glaçon = time.time()  # Démarre la pause
                 elif fruit.image == image_jaune:
-                    score += 3
+                    self.score += 3
 
                 fruits_a_supprimer.append(fruit)
 
@@ -272,6 +271,9 @@ class JeuFruitNinja:
             self.ajouter_fruit()
             self.timer_ajout = 0
 
+        if not self.en_cours:
+            self.afficher_fin_de_partie()
+
     def dessiner(self):
         # Afficher le fond à chaque mise à jour
         écran.blit(fond, (0, 0))  # Afficher l'image de fond
@@ -281,15 +283,46 @@ class JeuFruitNinja:
         for fruit in self.fruits:
             fruit.dessiner()
 
-        dessiner_score()
+        # Affichage du score pendant la partie
+        font = pygame.font.Font(None, 36)
+        text_score = font.render(f"Score: {self.score}", True, (255, 255, 255))
+        écran.blit(text_score, (HAUTEUR // 2 - text_score.get_width() // 2, 10))
 
         # Afficher les vies restantes
-        font = pygame.font.Font(None, 36)
         text_vies = font.render(f'Vies: {self.vies}', True, (255, 255, 255))
-        écran.blit(text_vies, (10, 50))
+        écran.blit(text_vies, (10, 10))
 
         pygame.display.flip()
 
+    def afficher_fin_de_partie(self):    # Fenêtre de fin de partie avec score et option pour recommencer
+           font = pygame.font.Font(None,58)
+           text_score = font.render(f"Votre score : {self.score}", True, (1, 2, 1))
+           text_recommencer = font.render("Appuyez sur 'R' pour recommencer ou 'Q' pour quitter", True, (255, 255, 255))
+
+           écran.blit(fond, (0, 0))  # Afficher le fond
+           écran.blit(text_score, (HAUTEUR // 2 - text_score.get_width() // 2, HAUTEUR // 2 - 50))
+
+    # Décaler le message vers la droite
+           decaler_droite = 200  # Ajuster cette valeur pour plus ou moins de décalage
+           écran.blit(text_recommencer, (HAUTEUR // 2 - text_recommencer.get_width() // 2 + decaler_droite, HAUTEUR // 2 + 50))
+
+           pygame.display.flip()
+
+    # Attendre une action de l'utilisateur
+           attendre_reponse = True
+           while attendre_reponse:
+               for événement in pygame.event.get():
+                   if événement.type == pygame.QUIT:
+                     pygame.quit()
+                     exit()
+                   elif événement.type == pygame.KEYDOWN:
+                       if événement.key == pygame.K_r:  # Recommencer
+                           self.__init__()  # Réinitialiser le jeu
+                           attendre_reponse = False
+                       elif événement.key == pygame.K_q:  # Quitter
+                            pygame.quit()
+                            exit()
+ 
 
 
 

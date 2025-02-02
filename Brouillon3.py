@@ -295,31 +295,35 @@ class JeuFruitNinja:
         pygame.display.flip()
 
     def afficher_fin_de_partie(self):
-        # Fenêtre de fin de partie avec score et option pour recommencer
+    # Fenêtre de fin de partie avec score et option pour recommencer
         font = pygame.font.Font(None, 48)
         text_score = font.render(f"Votre score : {self.score}", True, (255, 255, 255))
         text_recommencer = font.render("Appuyez sur 'R' pour recommencer ou 'Q' pour quitter", True, (255, 255, 255))
 
         écran.blit(fond, (0, 0))  # Afficher le fond
         écran.blit(text_score, (HAUTEUR // 2 - text_score.get_width() // 2, HAUTEUR // 2 - 50))
-        écran.blit(text_recommencer, (HAUTEUR // 2 - text_recommencer.get_width() // 2, HAUTEUR // 2 + 50))
+
+    # Centrage du message de recommencement
+        text_recommencer_x = HAUTEUR // 2 - text_recommencer.get_width() // 2
+        text_recommencer_y = HAUTEUR // 2 + 50
+        écran.blit(text_recommencer, (text_recommencer_x, text_recommencer_y))
 
         pygame.display.flip()
 
-        # Attendre une action de l'utilisateur
+    # Attendre une action de l'utilisateur
         attendre_reponse = True
         while attendre_reponse:
             for événement in pygame.event.get():
                 if événement.type == pygame.QUIT:
-                    pygame.quit()
-                    exit()
+                   pygame.quit()
+                   exit()
                 elif événement.type == pygame.KEYDOWN:
-                    if événement.key == pygame.K_r:  # Recommencer
-                        self.__init__()  # Réinitialiser le jeu
-                        attendre_reponse = False
-                    elif événement.key == pygame.K_q:  # Quitter
-                        pygame.quit()
-                        exit()
+                   if événement.key == pygame.K_r:  # Recommencer
+                      self.__init__()  # Réinitialiser le jeu
+                      attendre_reponse = False
+             
+              
+
 
 
 #======================================
