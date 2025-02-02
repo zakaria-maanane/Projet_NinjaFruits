@@ -177,6 +177,7 @@ class JeuFruitNinja:
         self.pause_glaçon = False
         self.temps_debut_glaçon = 0
         self.paused_fruits = False
+        self.nom_joueur = ""
 
     def ajouter_fruit(self):
         global score
@@ -281,67 +282,74 @@ class JeuFruitNinja:
 
 
 #======================================
-
+class Accueil:
+    def __init__(self):
+        self.nom_joueur = ""  # Attribut d'instance
 
     def accueil(self):
+        global nom_joueur
+        écran.blit(fond, (0, 0))  # Afficher l'image de fond à l'écran d'accueil
 
-     global nom_joueur 
+        font = pygame.font.Font(None, 48)
+        texte_accueil = font.render("Bienvenue dans Fruit Ninja !", True, (255, 255, 255))
+        écran.blit(texte_accueil, (LARGEUR // 2 - texte_accueil.get_width() // 2, 100))
 
-    écran.blit(fond, (0, 0))  # Afficher l'image de fond à l'écran d'accueil
+        joueurs = afficher_joueurs()
+        y_offset = 200
+        for joueur in joueurs:
+            texte_joueur = font.render(joueur.strip(), True, (255, 255, 255))
+            écran.blit(texte_joueur, (LARGEUR // 2 - texte_joueur.get_width() // 2, y_offset))
+            y_offset += 50
 
-    font = pygame.font.Font(None, 48)
-    texte_accueil = font.render("Bienvenue dans Fruit Ninja !", True, (255, 255, 255))
-    écran.blit(texte_accueil, (LARGEUR // 2 - texte_accueil.get_width() // 2, 100))
+        pygame.display.flip()
 
-    joueurs = afficher_joueurs()
-    y_offset = 200
-    for joueur in joueurs:
-        texte_joueur = font.render(joueur.strip(), True, (255, 255, 255))
-        écran.blit(texte_joueur, (LARGEUR // 2 - texte_joueur.get_width() // 2, y_offset))
-        y_offset += 50
+        nom_joueur = ""
+        active = True
 
-    pygame.display.flip()
+        while active:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_RETURN:
+                        if nom_joueur != "":
+                            self.nom_joueur = nom_joueur  # Enregistrer le nom du joueur dans l'attribut de l'instance
+                            enregistrer_score(self.nom_joueur, score)
+                            active = False  # Arrêter la boucle sans fermer la fenêtre
+                    elif event.key == pygame.K_BACKSPACE:
+                        nom_joueur = nom_joueur[:-1]
+                    else:
+                        nom_joueur += event.unicode
 
-    nom_joueur = ""
-    active = True
+                    # Redessiner l'écran à chaque modification
+                    écran.blit(fond, (0, 0))  # Redessiner l'image de fond
+                    texte_accueil = font.render("Bienvenue dans Fruit Ninja !", True, (255, 255, 255))
+                    écran.blit(texte_accueil, (LARGEUR // 2 - texte_accueil.get_width() // 2, 100))
 
-    while active:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RETURN:
-                    if nom_joueur != "":
-                        self.nom_joueur = nom_joueur
-                        enregistrer_score(self.nom_joueur, score)
-                    active = False
-                elif event.key == pygame.K_BACKSPACE:
-                    nom_joueur = nom_joueur[:-1]
-                else:
-                    nom_joueur += event.unicode
+                    # Afficher les joueurs
+                    y_offset = 200
+                    for joueur in joueurs:
+                        texte_joueur = font.render(joueur.strip(), True, (255, 255, 255))
+                        écran.blit(texte_joueur, (LARGEUR // 2 - texte_joueur.get_width() // 2, y_offset))
+                        y_offset += 50
 
-                # Redessiner l'écran à chaque modification
-                écran.blit(fond, (0, 0))  # Redessiner l'image de fond
-                texte_accueil = font.render("Bienvenue dans Fruit Ninja !", True, (255, 255, 255))
-                écran.blit(texte_accueil, (LARGEUR // 2 - texte_accueil.get_width() // 2, 100))
+                    # Afficher le nom du joueur en train d'être saisi
+                    texte_nom = font.render(f"Nom du joueur : {nom_joueur}", True, (255, 255, 255))
+                    écran.blit(texte_nom, (LARGEUR // 2 - texte_nom.get_width() // 2, 400))
 
-                # Afficher les joueurs
-                y_offset = 200
-                for joueur in joueurs:
-                    texte_joueur = font.render(joueur.strip(), True, (255, 255, 255))
-                    écran.blit(texte_joueur, (LARGEUR // 2 - texte_joueur.get_width() // 2, y_offset))
-                    y_offset += 50
+                    pygame.display.flip()
 
-                # Afficher le nom du joueur en train d'être saisi
-                texte_nom = font.render(f"Nom du joueur : {nom_joueur}", True, (255, 255, 255))
-                écran.blit(texte_nom, (LARGEUR // 2 - texte_nom.get_width() // 2, 400))
+        # Fermer la fenêtre après que l'utilisateur ait appuyé sur Entrée et terminé
+        
+        
 
-                pygame.display.flip()
+# Avant la boucle principale
+accueil = Accueil()
+accueil.accueil()  # Afficher l'écran d'accueil avant de commencer le jeu
 
-# Boucle principale
+# Après l'écran d'accueil, commencer le jeu
 jeu = JeuFruitNinja()
-jeu.accueil()
 
 while jeu.en_cours:
     jeu.gérer_événements()
@@ -351,3 +359,4 @@ while jeu.en_cours:
     horloge.tick(FPS)
 
 pygame.quit()
+
