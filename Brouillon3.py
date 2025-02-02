@@ -178,6 +178,7 @@ class JeuFruitNinja:
         self.temps_debut_glaçon = 0
         self.paused_fruits = False
         self.nom_joueur = ""
+        self.vies = 5  # Ajout du compteur de vies
 
     def ajouter_fruit(self):
         global score
@@ -240,7 +241,12 @@ class JeuFruitNinja:
                 fruit.bouger()
 
             if fruit.rect.bottom >= HAUTEUR + fruit.rect.height:
-                fruits_a_supprimer.append(fruit)
+                # Si un fruit sort du cadre et c'est une pomme, on perd une vie
+                if fruit.image == image_vert:
+                    self.vies -= 1
+                    if self.vies <= 0:
+                        self.en_cours = False  # La partie est terminée si les vies sont épuisées
+                    fruits_a_supprimer.append(fruit)
 
             if not hasattr(fruit, 'coupé') and fruit.est_touché(pygame.mouse.get_pos()):
                 fruit.coupé = True
@@ -277,7 +283,13 @@ class JeuFruitNinja:
 
         dessiner_score()
 
+        # Afficher les vies restantes
+        font = pygame.font.Font(None, 36)
+        text_vies = font.render(f'Vies: {self.vies}', True, (255, 255, 255))
+        écran.blit(text_vies, (10, 50))
+
         pygame.display.flip()
+
 
 
 
@@ -290,16 +302,20 @@ class Accueil:
         global nom_joueur
         écran.blit(fond, (0, 0))  # Afficher l'image de fond à l'écran d'accueil
 
-        font = pygame.font.Font(None, 48)
+        font = pygame.font.Font(None, 58)
         texte_accueil = font.render("Bienvenue dans Fruit Ninja !", True, (255, 255, 255))
         écran.blit(texte_accueil, (LARGEUR // 2 - texte_accueil.get_width() // 2, 100))
 
         joueurs = afficher_joueurs()
-        y_offset = 200
+        y_offset = 500
         for joueur in joueurs:
-            texte_joueur = font.render(joueur.strip(), True, (255, 255, 255))
+            texte_joueur = font.render(joueur.strip(), True, (0, 0, 0))
             écran.blit(texte_joueur, (LARGEUR // 2 - texte_joueur.get_width() // 2, y_offset))
             y_offset += 50
+
+        # Afficher "Nom du joueur" avant la saisie du nom
+        texte_nom_prompt = font.render("Nom du joueur : ", True, (0, 5, 5))
+        écran.blit(texte_nom_prompt, (LARGEUR // 2 - texte_nom_prompt.get_width() // 2,200))
 
         pygame.display.flip()
 
@@ -328,21 +344,18 @@ class Accueil:
                     écran.blit(texte_accueil, (LARGEUR // 2 - texte_accueil.get_width() // 2, 100))
 
                     # Afficher les joueurs
-                    y_offset = 200
+                    y_offset = 400
                     for joueur in joueurs:
-                        texte_joueur = font.render(joueur.strip(), True, (255, 255, 255))
+                        texte_joueur = font.render(joueur.strip(), True, (0, 5, 5))
                         écran.blit(texte_joueur, (LARGEUR // 2 - texte_joueur.get_width() // 2, y_offset))
                         y_offset += 50
 
                     # Afficher le nom du joueur en train d'être saisi
-                    texte_nom = font.render(f"Nom du joueur : {nom_joueur}", True, (255, 255, 255))
-                    écran.blit(texte_nom, (LARGEUR // 2 - texte_nom.get_width() // 2, 400))
+                    texte_nom = font.render(nom_joueur, True, (5, 5, 5))
+                    écran.blit(texte_nom, (LARGEUR // 2 - texte_nom.get_width() // 2, 150))  # Position du texte
 
                     pygame.display.flip()
 
-        # Fermer la fenêtre après que l'utilisateur ait appuyé sur Entrée et terminé
-        
-        
 
 # Avant la boucle principale
 accueil = Accueil()
@@ -359,4 +372,3 @@ while jeu.en_cours:
     horloge.tick(FPS)
 
 pygame.quit()
-

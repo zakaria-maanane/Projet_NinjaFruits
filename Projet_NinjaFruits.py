@@ -178,6 +178,7 @@ class JeuFruitNinja:
         self.temps_debut_glaçon = 0
         self.paused_fruits = False
         self.nom_joueur = ""
+        self.vies = 25  # Ajout du compteur de vies
 
     def ajouter_fruit(self):
         global score
@@ -240,7 +241,12 @@ class JeuFruitNinja:
                 fruit.bouger()
 
             if fruit.rect.bottom >= HAUTEUR + fruit.rect.height:
-                fruits_a_supprimer.append(fruit)
+                # Si un fruit sort du cadre et c'est une pomme, on perd une vie
+                if fruit.image == image_vert:
+                    self.vies -= 1
+                    if self.vies <= 0:
+                        self.en_cours = False  # La partie est terminée si les vies sont épuisées
+                    fruits_a_supprimer.append(fruit)
 
             if not hasattr(fruit, 'coupé') and fruit.est_touché(pygame.mouse.get_pos()):
                 fruit.coupé = True
@@ -277,7 +283,13 @@ class JeuFruitNinja:
 
         dessiner_score()
 
+        # Afficher les vies restantes
+        font = pygame.font.Font(None, 36)
+        text_vies = font.render(f'Vies: {self.vies}', True, (255, 255, 255))
+        écran.blit(text_vies, (10, 50))
+
         pygame.display.flip()
+
 
 
 
@@ -360,4 +372,3 @@ while jeu.en_cours:
     horloge.tick(FPS)
 
 pygame.quit()
-
