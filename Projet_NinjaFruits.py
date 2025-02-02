@@ -74,7 +74,7 @@ class Fruit:
             self.position_cible = hauteurs_niveaux[0]
             self.atteint_équilibre = False
         elif self.image == image_jaune:
-            self.vitesse_y = -1
+            self.vitesse_y = -10
             self.vitesse_x = 16
             self.acceleration = 0.2
             self.position_cible = hauteurs_niveaux[0]
@@ -179,20 +179,35 @@ class JeuFruitNinja:
         self.temps_debut_glaçon = 0
         self.paused_fruits = False
         self.nom_joueur = ""
-        self.vies = 5  # Compteur de vies
+        self.vies = 1115  # Compteur de vies
         self.score = 0  # Compteur de score
 
     def ajouter_fruit(self):
         if self.score < 10:
-            fruit_choisi = random.choices([image_rouge, image_vert, image_bleu, image_jaune, image_violet], [0, 13, 0, 0 ,1])[0]
+            fruit_choisi = random.choices(
+            [image_rouge, image_vert, image_bleu, image_jaune, image_violet], 
+            [0, 13, 0, 40, 1]
+        )[0]
         elif 10 <= self.score < 20:
-            fruit_choisi = random.choices([image_rouge, image_vert, image_bleu, image_jaune, image_violet], [0, 5, 0, 0 ,2])[0]
+           fruit_choisi = random.choices(
+            [image_rouge, image_vert, image_bleu, image_jaune, image_violet], 
+            [0, 5, 0, 5, 2]  # Correction : donner une probabilité > 0 à image_jaune
+        )[0]
         elif 20 <= self.score < 30:
-            fruit_choisi = random.choices([image_rouge, image_vert, image_bleu, image_jaune , image_violet], [0, 2, 1, 1,2])[0]
+           fruit_choisi = random.choices(
+            [image_rouge, image_vert, image_bleu, image_jaune, image_violet], 
+            [0, 2, 1, 3, 2]  # Correction : augmenter un peu image_jaune
+        )[0]
         elif self.score > 30:
-            fruit_choisi = random.choices([image_rouge, image_vert, image_bleu, image_jaune , image_violet], [1, 4, 2, 2 ,2])[0]
+           fruit_choisi = random.choices(
+            [image_rouge, image_vert, image_bleu, image_jaune, image_violet], 
+            [1, 4, 2, 3, 2]  # Correction : garder une probabilité raisonnable pour image_jaune
+        )[0]
         else:
-            fruit_choisi = random.choices([image_rouge, image_vert, image_bleu, image_jaune , image_violet], [0, 2, 3, 1, 2])[0]
+            fruit_choisi = random.choices(
+              [image_rouge, image_vert, image_bleu, image_jaune, image_violet], 
+            [0, 2, 3, 2, 2]  # Correction : éviter d'exclure image_jaune
+        )[0]
 
         self.fruits.append(Fruit(fruit_choisi))
 
