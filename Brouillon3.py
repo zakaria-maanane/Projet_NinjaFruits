@@ -3,6 +3,7 @@ import random
 import sys
 import time
 import math
+
 # Initialisation de Pygame
 pygame.init()
 
@@ -36,19 +37,18 @@ pygame.mixer.music.play(-1)
 
 # Chargement et redimensionnement des images des fruits
 image_rouge = pygame.image.load("bombe.png")
-image_rouge = pygame.transform.scale(image_rouge, (90, 90))  
+image_rouge = pygame.transform.scale(image_rouge, (90, 90))
 
 image_vert = pygame.image.load("pomme.png")
-image_vert = pygame.transform.scale(image_vert, (100, 100))  
+image_vert = pygame.transform.scale(image_vert, (100, 100))
 
 image_bleu = pygame.image.load("glace.png")
-image_bleu = pygame.transform.scale(image_bleu, (60, 60))  
+image_bleu = pygame.transform.scale(image_bleu, (60, 60))
 
 image_jaune = pygame.image.load("banana.png")
-image_jaune = pygame.transform.scale(image_jaune, (80, 80)) 
+image_jaune = pygame.transform.scale(image_jaune, (80, 80))
 
 image_violet = pygame.transform.scale(pygame.image.load("orange.png"), (100, 100))  # Fruit sinusoïdal
-
 
 # Police
 defaut_police = pygame.font.Font(None, 36)
@@ -91,8 +91,6 @@ class Fruit:
             self.acceleration = 0.2
             self.position_cible = hauteurs_niveaux[0]
             self.atteint_équilibre = False
-
-
         elif self.image == image_violet:
             self.init_fruit(0, 3, 0, 0)  # Mouvement sinusoïdal
             self.angle = 0
@@ -111,16 +109,16 @@ class Fruit:
             self.rect.x += 5 * math.sin(self.angle)
             self.rect.y -= 3
             self.angle += 0.1
-        else:    
+        else:
             if not self.atteint_équilibre:
-               self.rect.y += self.vitesse_y 
-               self.rect.x += self.vitesse_x
-               self.vitesse_y += 0.1
+                self.rect.y += self.vitesse_y
+                self.rect.x += self.vitesse_x
+                self.vitesse_y += 0.1
 
-               if self.rect.top <= self.position_cible:
-                  self.rect.top = self.position_cible
-                  self.vitesse_y = 0
-                  self.atteint_équilibre = True
+                if self.rect.top <= self.position_cible:
+                    self.rect.top = self.position_cible
+                    self.vitesse_y = 0
+                    self.atteint_équilibre = True
             else:
                 self.vitesse_y += self.acceleration
                 self.rect.y += self.vitesse_y
@@ -140,13 +138,17 @@ class Lame:
     def __init__(self):
         self.positions = []
         self.longueur_max = 10
+        self.image = pygame.image.load("ninja.png")  # Remplace par le chemin de ton image
+        self.rect = self.image.get_rect()
 
-    def mettre_à_jour(self, pos):
-        self.positions.append(pos)
+    def mettre_a_jour(self, position_souris):
+        self.positions.append(position_souris)
+        self.rect.center = position_souris
         if len(self.positions) > self.longueur_max:
             self.positions.pop(0)
 
     def dessiner(self):
+        écran.blit(self.image, self.rect)
         if len(self.positions) > 1:
             pygame.draw.lines(écran, (255, 255, 255), False, self.positions, 3)
 
@@ -154,6 +156,21 @@ def dessiner_score():
     texte_score = defaut_police.render(f"Score : {score}", True, (255, 255, 255))
     écran.blit(texte_score, (10, 10))
 
+
+
+
+
+score = 0
+nom_joueur = ""
+
+# Dictionnaire associant les touches aux fruits
+TOUCHES_FRUITS = {
+    "x": image_rouge,  # Bombe
+    "v": image_vert,   # Pomme
+    "b": image_bleu,   # Glaçon
+    "j": image_jaune,   # Banane
+    "o": image_violet
+}
 class JeuFruitNinja:
     def __init__(self):
         self.fruits = []
@@ -164,11 +181,13 @@ class JeuFruitNinja:
         self.pause_glaçon = False
         self.temps_debut_glaçon = 0
         self.paused_fruits = False
+        self.lame.mettre_a_jour(pygame.mouse.get_pos())  # Mets à jour la position de la lame avec la position de la souris
+
 
     def ajouter_fruit(self):
         global score
         if score < 10:
-            fruit_choisi = random.choices([image_rouge, image_vert, image_bleu, image_jaune, image_violet], [0, 8, 0, 0 ,1])[0]
+            fruit_choisi = random.choices([image_rouge, image_vert, image_bleu, image_jaune, image_violet], [0, 13, 0, 0 ,1])[0]
         elif 10 <= score < 20:
             fruit_choisi = random.choices([image_rouge, image_vert, image_bleu, image_jaune, image_violet], [0, 5, 0, 0 ,2])[0]
         elif 20 <= score < 30:
@@ -193,7 +212,7 @@ class JeuFruitNinja:
             self.paused_fruits = False
             self.pause_glaçon = False
 
-        self.lame.mettre_à_jour(pygame.mouse.get_pos())
+        self.lame.mettre_a_jour(pygame.mouse.get_pos())
 
         fruits_a_supprimer = []
 
@@ -242,43 +261,8 @@ class JeuFruitNinja:
         pygame.display.flip()
 
     def accueil(self):
-        # Afficher le fond d'écran d'accueil
-        écran.blit(fond, (0, 0))  # Afficher l'image de fond à l'écran d'accueil
-
-        # Écran d'accueil où le joueur entre son nom
-        font = pygame.font.Font(None, 48)
-        texte_accueil = font.render("Bienvenue dans Fruit Ninja !", True, (255, 255, 255))
-        texte_nom = font.render("Entrez votre nom:", True, (255, 255, 255))
-        
-        # Afficher l'écran d'accueil
-        écran.blit(texte_accueil, (LARGEUR // 3, HAUTEUR // 3))
-        écran.blit(texte_nom, (LARGEUR // 3, HAUTEUR // 2))
-        pygame.display.flip()
-
-        # Entrée du nom du joueur
-        nom = ""
-        entrer_nom = True
-        while entrer_nom:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_RETURN:
-                        self.nom_joueur = nom
-                        entrer_nom = False
-                    elif event.key == pygame.K_BACKSPACE:
-                        nom = nom[:-1]
-                    else:
-                        nom += event.unicode
-            # Afficher le nom en temps réel
-            écran.fill((0, 0, 0))
-            écran.blit(fond, (0, 0))  # Afficher l'image de fond pendant la saisie du nom
-            écran.blit(texte_accueil, (LARGEUR // 3, HAUTEUR // 3))
-            écran.blit(texte_nom, (LARGEUR // 3, HAUTEUR // 2))
-            nom_texte = font.render(nom, True, (255, 255, 255))
-            écran.blit(nom_texte, (LARGEUR // 3, HAUTEUR // 1.5))
-            pygame.display.flip()
+        accueil_screen = Accueil(écran)  # Crée l'instance de la classe Accueil
+        self.nom_joueur = accueil_screen.saisir_nom()  # Saisir le nom et le retourner
 
     def executer(self):
         self.accueil()  # Afficher l'écran d'accueil
@@ -291,8 +275,68 @@ class JeuFruitNinja:
 
         enregistrer_score(self.nom_joueur, score)
 
-if __name__ == "__main__":
-    jeu = JeuFruitNinja()
-    jeu.executer()
-    pygame.quit()
-    sys.exit()
+class Accueil:
+    def __init__(self, écran):
+        self.écran = écran
+        self.nom_joueur = ""
+
+    def afficher(self):
+        # Charger l'image de fond
+        écran.blit(fond, (0, 0))  # Afficher l'image de fond à l'écran d'accueil
+
+        font = pygame.font.Font(None, 48)
+        texte_accueil = font.render("Bienvenue dans Fruit Ninja !", True, (255, 255, 255))
+        écran.blit(texte_accueil, (LARGEUR // 2 - texte_accueil.get_width() // 2, 100))
+
+        joueurs = afficher_joueurs()
+        y_offset = 200
+        for joueur in joueurs:
+            texte_joueur = font.render(joueur.strip(), True, (255, 255, 255))
+            écran.blit(texte_joueur, (LARGEUR // 2 - texte_joueur.get_width() // 2, y_offset))
+            y_offset += 50
+
+        pygame.display.flip()
+
+    def saisir_nom(self):
+        global nom_joueur
+        nom_joueur = ""
+        active = True
+        font = pygame.font.Font(None, 48)
+
+        while active:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_RETURN:
+                        if nom_joueur != "":
+                            return nom_joueur  # Renvoie le nom du joueur après validation
+                        active = False
+                    elif event.key == pygame.K_BACKSPACE:
+                        nom_joueur = nom_joueur[:-1]
+                    else:
+                        nom_joueur += event.unicode
+
+                    # Redessiner l'écran à chaque modification
+                    écran.blit(fond, (0, 0))  # Redessiner l'image de fond
+                    self.afficher()  # Afficher les éléments de l'écran d'accueil
+
+                    # Afficher le nom du joueur en train d'être saisi
+                    texte_nom = font.render(f"Nom du joueur : {nom_joueur}", True, (255, 255, 255))
+                    écran.blit(texte_nom, (LARGEUR // 2 - texte_nom.get_width() // 2, 400))
+
+                    pygame.display.flip()
+
+# Boucle principale
+jeu = JeuFruitNinja()
+jeu.accueil()
+
+while jeu.en_cours:
+    jeu.gérer_événements()
+    jeu.mettre_a_jour()
+    jeu.dessiner()
+
+    horloge.tick(FPS)
+
+pygame.quit()
