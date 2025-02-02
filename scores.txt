@@ -5,3 +5,12 @@ z: Score : 0
 p: Score : 0
 p: Score : 0
 p: Score : 0
+o: Score : 0
+p: Score : 0
+o: Score : 0
+o: Score : 0
+p: Score : 0
+p: Score : 0
+p: Score : 0
+r: Score : 0
+p: Score : 0
