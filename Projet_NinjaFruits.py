@@ -104,11 +104,62 @@ class Fruit:
         self.rect.centerx = random.randint(self.rect.width, LARGEUR - self.rect.width)
         self.rect.bottom = HAUTEUR + self.rect.height
 
+    class Fruit:
+     def __init__(self, image):
+        self.image = image
+        self.rect = self.image.get_rect()
+        self.rect.centerx = random.randint(self.rect.width, LARGEUR - self.rect.width)
+        self.rect.bottom = HAUTEUR + self.rect.height
+
+        if self.image == image_rouge:
+            self.vitesse_y = -11
+            self.vitesse_x = random.uniform(-1, 3)
+            self.acceleration = 0.2
+            self.position_cible = hauteurs_niveaux[0]
+            self.atteint_équilibre = False
+        elif self.image == image_jaune:
+            self.vitesse_y = -10
+            self.vitesse_x = 16
+            self.acceleration = 0.2
+            self.position_cible = hauteurs_niveaux[0]
+            self.atteint_équilibre = False
+        elif self.image == image_vert:
+            self.vitesse_y = -8
+            self.vitesse_x = random.uniform(-2, 3)
+            self.acceleration = 0.2
+            self.position_cible = random.choice(hauteurs_niveaux)
+            self.atteint_équilibre = False
+        elif self.image == image_bleu:
+            self.vitesse_y = -5
+            self.vitesse_x = random.uniform(-2, 3)
+            self.acceleration = 0.2
+            self.position_cible = hauteurs_niveaux[0]
+            self.atteint_équilibre = False
+        elif self.image == image_violet:  # Orange avec évitement du joueur
+            self.init_fruit(0, 3, 0, 0)
+            self.angle = 0
+
     def bouger(self):
-        if self.image == image_violet:
-            self.rect.x += 5 * math.sin(self.angle)
-            self.rect.y -= 3
-            self.angle += 0.1
+        if self.image == image_violet:  # Si c'est l'orange, elle évite le joueur
+            souris_x, souris_y = pygame.mouse.get_pos()
+            distance_x = self.rect.centerx - souris_x
+            distance_y = self.rect.centery - souris_y
+            distance = math.sqrt(distance_x ** 2 + distance_y ** 2)
+
+            if distance < 150:  # Seuil de détection pour l'évitement
+                if distance_x > 0:
+                    self.rect.x += 6  # S'éloigne vers la droite
+                else:
+                    self.rect.x -= 6  # S'éloigne vers la gauche
+                
+                if distance_y > 0:
+                    self.rect.y += 6  # S'éloigne vers le bas
+                else:
+                    self.rect.y -= 6  # S'éloigne vers le haut
+            else:
+                self.rect.x += 5 * math.sin(self.angle)  # Mouvement sinusoïdal
+                self.rect.y -= 3
+                self.angle += 0.1
         else:
             if not self.atteint_équilibre:
                 self.rect.y += self.vitesse_y
@@ -235,6 +286,8 @@ class JeuFruitNinja:
                                 self.temps_debut_glaçon = time.time()  # Démarre la pause
                             elif fruit.image == image_jaune:
                                 self.score += 3
+                            elif fruit.image == image_violet:
+                                self.score += 5    
                     fruits_a_supprimer = [fruit for fruit in self.fruits if getattr(fruit, 'coupé', False)]
                     for fruit in fruits_a_supprimer:
                         self.fruits.remove(fruit)
