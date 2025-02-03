@@ -104,40 +104,7 @@ class Fruit:
         self.rect.centerx = random.randint(self.rect.width, LARGEUR - self.rect.width)
         self.rect.bottom = HAUTEUR + self.rect.height
 
-    class Fruit:
-     def __init__(self, image):
-        self.image = image
-        self.rect = self.image.get_rect()
-        self.rect.centerx = random.randint(self.rect.width, LARGEUR - self.rect.width)
-        self.rect.bottom = HAUTEUR + self.rect.height
-
-        if self.image == image_rouge:
-            self.vitesse_y = -11
-            self.vitesse_x = random.uniform(-1, 3)
-            self.acceleration = 0.2
-            self.position_cible = hauteurs_niveaux[0]
-            self.atteint_équilibre = False
-        elif self.image == image_jaune:
-            self.vitesse_y = -10
-            self.vitesse_x = 16
-            self.acceleration = 0.2
-            self.position_cible = hauteurs_niveaux[0]
-            self.atteint_équilibre = False
-        elif self.image == image_vert:
-            self.vitesse_y = -8
-            self.vitesse_x = random.uniform(-2, 3)
-            self.acceleration = 0.2
-            self.position_cible = random.choice(hauteurs_niveaux)
-            self.atteint_équilibre = False
-        elif self.image == image_bleu:
-            self.vitesse_y = -5
-            self.vitesse_x = random.uniform(-2, 3)
-            self.acceleration = 0.2
-            self.position_cible = hauteurs_niveaux[0]
-            self.atteint_équilibre = False
-        elif self.image == image_violet:  # Orange avec évitement du joueur
-            self.init_fruit(0, 3, 0, 0)
-            self.angle = 0
+    
 
     def bouger(self):
         if self.image == image_violet:  # Si c'est l'orange, elle évite le joueur
@@ -207,7 +174,7 @@ def dessiner_score():
 
 
 
-score = 0
+
 nom_joueur = ""
 
 # Dictionnaire associant les touches aux fruits
@@ -237,17 +204,17 @@ class JeuFruitNinja:
         if self.score < 10:
             fruit_choisi = random.choices(
             [image_rouge, image_vert, image_bleu, image_jaune, image_violet], 
-            [0, 13, 0, 40, 1]
+            [0, 10, 3, 4, 2]
         )[0]
         elif 10 <= self.score < 20:
            fruit_choisi = random.choices(
             [image_rouge, image_vert, image_bleu, image_jaune, image_violet], 
-            [0, 5, 0, 5, 2]  # Correction : donner une probabilité > 0 à image_jaune
+            [0, 5, 0, 5, 3]  # Correction : donner une probabilité > 0 à image_jaune
         )[0]
         elif 20 <= self.score < 30:
            fruit_choisi = random.choices(
             [image_rouge, image_vert, image_bleu, image_jaune, image_violet], 
-            [0, 2, 1, 3, 2]  # Correction : augmenter un peu image_jaune
+            [0, 2, 2, 3, 3]  # Correction : augmenter un peu image_jaune
         )[0]
         elif self.score > 30:
            fruit_choisi = random.choices(
@@ -328,6 +295,8 @@ class JeuFruitNinja:
                     self.temps_debut_glaçon = time.time()  # Démarre la pause
                 elif fruit.image == image_jaune:
                     self.score += 3
+                elif fruit.image == image_violet:
+                    self.score += 4    
 
                 fruits_a_supprimer.append(fruit)
 
