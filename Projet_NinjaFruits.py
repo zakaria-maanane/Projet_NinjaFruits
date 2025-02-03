@@ -173,8 +173,6 @@ def dessiner_score():
 
 
 
-
-
 nom_joueur = ""
 
 # Dictionnaire associant les touches aux fruits
@@ -260,7 +258,7 @@ class JeuFruitNinja:
                         self.fruits.remove(fruit)
 
     def mettre_a_jour(self):
-        if self.pause_glaçon and time.time() - self.temps_debut_glaçon < 5:
+        if self.pause_glaçon and time.time() - self.temps_debut_glaçon < 3:
             self.paused_fruits = True
         else:
             self.paused_fruits = False
